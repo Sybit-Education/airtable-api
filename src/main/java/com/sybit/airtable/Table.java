@@ -458,7 +458,12 @@ public class Table<T> {
         for (Map<String, Object> record : records.getRecords()) {
             T item = null;
             try {
-                item = transform(record, this.type.newInstance());
+ 		if (this.type == RecordItem.class) {
+		    item = (T) new RecordItem();
+		    ((RecordItem)item).setFields(record);
+		} else {
+		    item = transform(record, this.type.newInstance());
+		}
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 LOG.error(e.getMessage(), e);
             }
@@ -497,6 +502,9 @@ public class Table<T> {
         }
 
         try {
+	    if (this.type == RecordItem.class) {
+		return (T)body;
+	    }
             return transform(body, this.type.newInstance());
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
             throw new AirtableException(e);
@@ -543,6 +551,9 @@ public class Table<T> {
         }
 
         try {
+	    if (this.type == RecordItem.class) {
+		return (T)responseBody;
+	    }
             return transform(responseBody, this.type.newInstance());
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
             LOG.error(e.getMessage(), e);
@@ -592,6 +603,9 @@ public class Table<T> {
 
         T result;
         try {
+	    if (this.type == RecordItem.class) {
+		return (T)responseBody;
+	    }
             result = transform(responseBody, this.type.newInstance());
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
             LOG.error(e.getMessage(), e);
